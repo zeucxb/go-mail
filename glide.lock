@@ -1,0 +1,6 @@
+hash: d8df4cc8ee686da554fdf6bfed3293ea8d9ff775dca16039a8099367275fe26f
+updated: 2016-10-18T19:30:34.512360709-02:00
+imports:
+- name: gopkg.in/gomail.v2
+  version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
+testImports: []
