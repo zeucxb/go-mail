@@ -59,7 +59,6 @@ func main() {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", config.Email)
-	m.SetHeader("To", mail.Headers.To...)
 	m.SetAddressHeader("Cc", mail.Headers.Cc.Adress, mail.Headers.Cc.Name)
 	m.SetHeader("Subject", mail.Headers.Subject)
 	m.SetBody("text/html", mail.Body.Text)
@@ -80,8 +79,23 @@ func main() {
 	d := gomail.NewDialer(config.SMTP, config.Port, config.Email, config.Pass)
 
 	// Send the email
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+
+	if len(mail.Mails) > 0 {
+		for _, email := range mail.Mails {
+			m.SetHeader("To", email)
+
+			if err := d.DialAndSend(m); err != nil {
+				panic(err)
+			}
+		}
+	}
+
+	if len(mail.Headers.To) > 0 {
+		m.SetHeader("To", mail.Headers.To...)
+
+		if err := d.DialAndSend(m); err != nil {
+			panic(err)
+		}
 	}
 }
 
