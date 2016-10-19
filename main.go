@@ -39,7 +39,7 @@ func main() {
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "alex@example.com")
+	m.SetHeader("From", email)
 	m.SetHeader("To", "zeucxb@gmail.com", "zeu-x@hotmail.com")
 	m.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	m.SetHeader("Subject", "Hello!")
@@ -47,7 +47,7 @@ func main() {
 	m.Attach("/Users/zeucxb/Downloads/11702749.png")
 	m.Attach("/Users/zeucxb/Downloads/photo.png")
 
-	// d := gomail.NewDialer("smtp.gmail.com", 587, "zeucxb", "ntkjyfbeemkuihss")
+	// d := gomail.NewDialer("smtp.gmail.com", 587, "zeucxb", "")
 	d := gomail.NewDialer(smtp, port, email, pass)
 
 	// Send the email to Bob, Cora and Dan.
