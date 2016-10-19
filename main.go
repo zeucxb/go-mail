@@ -1,45 +1,61 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	gomail "gopkg.in/gomail.v2"
 )
 
 func main() {
-	var smtp, email, pass string
-	var port int
+	var config config
 
 	fmt.Println("Welcome Gopher ʕ◔ϖ◔ʔ")
 
-	fmt.Println("Enter your settings:")
+	if _, err := os.Stat(".config"); os.IsNotExist(err) {
+		fmt.Println("Enter your settings:")
 
-	fmt.Print("SMTP: ")
-	fmt.Scan(&smtp)
+		fmt.Print("SMTP: ")
+		fmt.Scan(&config.SMTP)
 
-	fmt.Printf("port: ")
-	if _, err := fmt.Scanf("%v", &port); err != nil {
-		panic(err)
+		fmt.Printf("port: ")
+		if _, err := fmt.Scanf("%v", &config.Port); err != nil {
+			panic(err)
+		}
+
+		fmt.Print("email: ")
+		fmt.Scan(&config.Email)
+
+		fmt.Print("password: ")
+		fmt.Scan(&config.Pass)
+
+		var remember bool
+		fmt.Printf("\n%s\n", "Want to remember? (t/f)")
+		if _, err := fmt.Scan(&remember); err != nil {
+			panic(err)
+		}
+
+		if remember {
+			if c, err := json.Marshal(config); err == nil {
+				if err := ioutil.WriteFile(".config", c, 0644); err != nil {
+					panic(err)
+				}
+			} else {
+				panic(err)
+			}
+		}
 	}
 
-	fmt.Print("email: ")
-	fmt.Scan(&email)
-
-	fmt.Print("password: ")
-	fmt.Scan(&pass)
-
-	var remember bool
-	fmt.Printf("\n%s\n", "Want to remember? (t/f)")
-	if _, err := fmt.Scan(&remember); err != nil {
-		panic(err)
-	}
-
-	if remember {
-		fmt.Println("TRUE")
+	if file, err := ioutil.ReadFile(".config"); err == nil {
+		if err = json.Unmarshal(file, &config); err != nil {
+			panic(err)
+		}
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", email)
+	m.SetHeader("From", config.Email)
 	m.SetHeader("To", "zeucxb@gmail.com", "zeu-x@hotmail.com")
 	m.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	m.SetHeader("Subject", "Hello!")
@@ -47,11 +63,17 @@ func main() {
 	m.Attach("/Users/zeucxb/Downloads/11702749.png")
 	m.Attach("/Users/zeucxb/Downloads/photo.png")
 
-	// d := gomail.NewDialer("smtp.gmail.com", 587, "zeucxb", "")
-	d := gomail.NewDialer(smtp, port, email, pass)
+	d := gomail.NewDialer(config.SMTP, config.Port, config.Email, config.Pass)
 
-	// Send the email to Bob, Cora and Dan.
+	// Send the email
 	if err := d.DialAndSend(m); err != nil {
 		panic(err)
 	}
+}
+
+type config struct {
+	SMTP  string `json:"smtp"`
+	Email string `json:"email"`
+	Pass  string `json:"pass"`
+	Port  int    `json:"port"`
 }
