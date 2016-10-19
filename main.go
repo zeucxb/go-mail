@@ -10,7 +10,10 @@ import (
 )
 
 func main() {
-	var config config
+	var (
+		config config
+		mail   mail
+	)
 
 	fmt.Println("Welcome Gopher ʕ◔ϖ◔ʔ")
 
@@ -56,12 +59,23 @@ func main() {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", config.Email)
-	m.SetHeader("To", "zeucxb@gmail.com", "zeu-x@hotmail.com")
-	m.SetAddressHeader("Cc", "dan@example.com", "Dan")
-	m.SetHeader("Subject", "Hello!")
-	m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
-	m.Attach("/Users/zeucxb/Downloads/11702749.png")
-	m.Attach("/Users/zeucxb/Downloads/photo.png")
+	m.SetHeader("To", mail.Headers.To...)
+	m.SetAddressHeader("Cc", mail.Headers.Cc.Adress, mail.Headers.Cc.Name)
+	m.SetHeader("Subject", mail.Headers.Subject)
+	m.SetBody("text/html", mail.Body.Text)
+
+	for _, file := range mail.Attach {
+		m.Attach(file)
+	}
+
+	// m := gomail.NewMessage()
+	// m.SetHeader("From", config.Email)
+	// m.SetHeader("To", "zeucxb@gmail.com", "zeu-x@hotmail.com")
+	// m.SetAddressHeader("Cc", "dan@example.com", "Dan")
+	// m.SetHeader("Subject", "Hello!")
+	// m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
+	// m.Attach("/Users/zeucxb/Downloads/11702749.png")
+	// m.Attach("/Users/zeucxb/Downloads/photo.png")
 
 	d := gomail.NewDialer(config.SMTP, config.Port, config.Email, config.Pass)
 
@@ -76,4 +90,21 @@ type config struct {
 	Email string `json:"email"`
 	Pass  string `json:"pass"`
 	Port  int    `json:"port"`
+}
+
+type mail struct {
+	Headers struct {
+		To []string `json:"to"`
+		Cc struct {
+			Adress string `json:"adress"`
+			Name   string `json:"name"`
+		} `json:"cc"`
+		Subject string `json:"subject"`
+	} `json:"headers"`
+	Body struct {
+		Text string `json:"text"`
+		File string `json:"file"`
+	} `json:"body"`
+	Attach []string `json:"attach"`
+	Mails  []string `json:"mails"`
 }
