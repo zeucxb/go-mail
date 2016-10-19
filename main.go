@@ -79,7 +79,6 @@ func main() {
 	d := gomail.NewDialer(config.SMTP, config.Port, config.Email, config.Pass)
 
 	// Send the email
-
 	if len(mail.Mails) > 0 {
 		for _, email := range mail.Mails {
 			m.SetHeader("To", email)
@@ -98,6 +97,10 @@ func main() {
 		}
 	}
 }
+
+// TODO: Refac
+// TODO: Make (it all) methods
+// TODO: Make a package
 
 type config struct {
 	SMTP  string `json:"smtp"`
